@@ -1,0 +1,17 @@
+# Install with: pip install -r app/requirements.txt --break-system-packages
+# (drop --break-system-packages if you're using a venv, which you already are)
+flask
+Pillow
+torch
+torchvision
+opencv-python-headless
+numpy
+pandas
+matplotlib
+shap
+grad-cam
+
+# gradio>=4.0       # tried after Streamlit also crashed — hit the same
+                     # unresolved native crash. Kept for reference only.
+# streamlit>=1.32   # original version — hit an unresolved native crash on
+                     # Windows. Kept for reference only.

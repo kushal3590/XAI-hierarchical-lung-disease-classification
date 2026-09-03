@@ -1,0 +1,29 @@
+# Install once from project root:
+#   pip install -r requirements.txt
+#
+# Covers everything used across scripts/, src/, and app/ — data pipeline,
+# training, evaluation, explainability (Grad-CAM/SHAP/LIME), and the Flask
+# demo app.
+
+torch
+torchvision
+numpy
+pandas
+opencv-python-headless
+matplotlib
+seaborn
+scikit-learn
+statsmodels
+tensorboard
+grad-cam
+shap
+lime
+scikit-image
+flask
+Pillow
+
+# --- Known Windows-specific issue ---
+# scikit-learn + tensorboard can conflict at the native-DLL level on some
+# Windows setups, causing a silent crash in train.py (no traceback). If you
+# hit this, src/metrics.py is a numpy-only drop-in replacement for the
+# specific sklearn.metrics calls train.py makes — see that file's docstring.

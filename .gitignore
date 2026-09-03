@@ -1,0 +1,51 @@
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+
+# --- Virtual environment ---
+venv/
+.venv/
+
+# --- Raw / processed dataset ---
+# Too large for git (44,776 images, several GB). See
+# data/DATASET_ACQUISITION.md to re-download and
+# scripts/build_manifest.py to regenerate data/manifests/*.csv on a new machine.
+data/raw/
+data/processed/
+
+# --- Empty/unused placeholder folders ---
+models/
+notebooks/
+
+# --- Model checkpoints ---
+# Large binary files, not suited to plain git. See README.md for how to
+# obtain the finalized checkpoint (download link) or retrain from scratch.
+outputs/checkpoints/
+outputs/checkpoints_seed123/
+outputs/checkpoints_masked/
+outputs/checkpoints_masked_pw16/
+
+# --- Bulk generated artifacts ---
+# Thousands of images each — fully regenerable via scripts/gradcam_explain.py
+# and scripts/shap_lime_explain.py. Keep outputs/evaluation*/ (small,
+# valuable result files) tracked — only these bulky folders are excluded.
+outputs/gradcam/
+outputs/gradcam_full/
+outputs/gradcam_full_seed123/
+outputs/shap_lime/
+outputs/shap_lime_seed123/
+outputs/logs/
+outputs/logs_baseline/
+outputs/logs_seed123/
+outputs/logs_baseline_seed123/
+outputs/logs_masked/
+
+# --- App-specific ---
+.streamlit/
+streamlit_log.txt
+
+# --- Misc ---
+*.log
+.DS_Store
+Thumbs.db
