@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% block title %}Analyze{% endblock %}
+{% block content %}
+
+<div class="workspace" data-default-threshold="{{ default_threshold_pct }}">
+
+  <!-- ===================== Control rail ===================== -->
+  <aside class="rail glass" data-spot>
+    <div class="rail-head">
+      <h1 class="metal-text">Analyze an X-ray</h1>
+      <p>Frontal chest radiographs (PA or AP) work best.</p>
+    </div>
+
+    <form id="scan-form" novalidate>
+      <label class="dropzone" id="dropzone">
+        <input type="file" id="xray" name="xray" accept="image/png,image/jpeg" hidden>
+        <div class="dz-empty">
+          <span class="dz-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0-4 4m4-4 4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+          </span>
+          <strong>Drop an X-ray here</strong>
+          <span>or <u>browse files</u>. JPG or PNG.</span>
+        </div>
+        <div class="dz-file" hidden>
+          <img class="dz-thumb" alt="">
+          <div class="dz-meta">
+            <strong class="dz-name"></strong>
+            <span class="dz-size"></span>
+          </div>
+          <button type="button" class="icon-btn dz-clear" aria-label="Remove image">
+            <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+      </label>
+
+      <fieldset class="field">
+        <legend>Explanation detail</legend>
+        <div class="segmented" role="radiogroup">
+          <label><input type="radio" name="depth" value="standard" checked><span><strong>Standard</strong><small>Heatmaps in seconds</small></span></label>
+          <label><input type="radio" name="depth" value="deep"><span><strong>Detailed</strong><small>Adds SHAP, about a minute</small></span></label>
+        </div>
+      </fieldset>
+
+      <details class="advanced">
+        <summary>
+          <span>Advanced settings</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="advanced-body">
+          <div class="slider-field">
+            <div class="slider-top">
+              <label for="threshold">Screening cutoff</label>
+              <output id="threshold-out">{{ default_threshold_pct }}%</output>
+            </div>
+            <input type="range" id="threshold" name="threshold_pct" min="5" max="80" step="1" value="{{ default_threshold_pct }}">
+            <p class="hint">A scan is flagged abnormal when its screening score reaches this value. Lower catches more disease but raises false alarms.</p>
+            <button type="button" class="text-btn" id="threshold-reset">Reset to recommended ({{ default_threshold_pct }}%)</button>
+          </div>
+          <div class="slider-field" id="shap-field">
+            <div class="slider-top">
+              <label for="shap_evals">SHAP resolution</label>
+              <output id="shap-out">200</output>
+            </div>
+            <input type="range" id="shap_evals" name="shap_evals" min="100" max="500" step="50" value="200">
+            <p class="hint">Used for detailed explanations. Higher is sharper but slower.</p>
+          </div>
+        </div>
+      </details>
+
+      <button class="btn btn-primary btn-block" id="run-btn" type="submit" disabled>
+        <span class="btn-label">Analyze X-ray</span>
+        <span class="btn-spinner" aria-hidden="true"></span>
+      </button>
+    </form>
+
+    <p class="rail-note">Images are processed on this computer and are not uploaded anywhere else.</p>
+  </aside>
+
+  <!-- ===================== Stage ===================== -->
+  <section class="stage" aria-live="polite">
+
+    <!-- Empty -->
+    <div class="state state-empty is-visible glass" data-state="empty">
+      <div class="empty-frame">
+        <div class="halo" aria-hidden="true">
+          <span class="halo-ring r1"></span>
+          <span class="halo-ring r2"></span>
+          <span class="halo-glow"></span>
+        </div>
+        {% with lid = "empty" %}{% include "_lungs.html" %}{% endwith %}
+      </div>
+      <div class="empty-copy">
+        <h2 class="metal-text">Your results will appear here</h2>
+        <p>Add a chest X-ray on the left, then select <strong>Analyze X-ray</strong>. You'll get the most likely outcome, how the decision was reached, and a heatmap of where the model looked.</p>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="state state-loading glass" data-state="loading">
+      <div class="scan-frame">
+        <img class="scan-img" alt="X-ray being analyzed">
+        <div class="scan-beam"></div>
+        <div class="scan-grid"></div>
+      </div>
+      <ol class="scan-steps">
+        <li data-step="0">Enhancing contrast</li>
+        <li data-step="1">Screening for abnormality</li>
+        <li data-step="2">Classifying the finding</li>
+        <li data-step="3">Mapping attention</li>
+        <li data-step="4" class="deep-only">Computing SHAP attribution</li>
+      </ol>
+    </div>
+
+    <!-- Error -->
+    <div class="state state-error glass" data-state="error">
+      <div class="error-card">
+        <span class="error-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5m0 3v.2"/></svg></span>
+        <h2>The analysis didn't finish</h2>
+        <p class="error-msg"></p>
+        <button class="btn btn-ghost" type="button" data-action="retry">Try again</button>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="state state-result" data-state="result">
+
+      <header class="verdict glass" data-spot>
+        <div class="ring" aria-hidden="true">
+          <svg viewBox="0 0 120 120">
+            <circle class="ring-track" cx="60" cy="60" r="52"/>
+            <circle class="ring-fill" cx="60" cy="60" r="52"/>
+          </svg>
+          <div class="ring-value"><span class="ring-num-wrap"><span class="ring-num">0</span><small>%</small></span></div>
+        </div>
+        <div class="verdict-text">
+          <p class="verdict-kicker">Most likely outcome</p>
+          <h2 class="verdict-label">—</h2>
+          <p class="verdict-sub"></p>
+          <p class="saved-note" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Saved to history</p>
+        </div>
+        <div class="verdict-actions">
+          <button class="btn btn-ghost btn-sm" type="button" data-action="print">
+            <svg viewBox="0 0 24 24"><path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M7 14h10v7H7z"/></svg>
+            Print report
+          </button>
+          <button class="btn btn-ghost btn-sm" type="button" data-action="new">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            New scan
+          </button>
+        </div>
+      </header>
+
+      <div class="result-grid">
+        <div class="viewer-card glass">
+          <div class="viewer-tabs" role="tablist" aria-label="Image layer">
+            <span class="tab-pill" aria-hidden="true"></span>
+            <button role="tab" data-layer="input" aria-selected="false">Original</button>
+            <button role="tab" data-layer="gradcam1" aria-selected="true">Screening focus</button>
+            <button role="tab" data-layer="gradcam2" aria-selected="false">Disease focus</button>
+            <button role="tab" data-layer="shap" aria-selected="false" hidden>SHAP</button>
+          </div>
+
+          <div class="viewer" id="viewer">
+            <img class="viewer-base" alt="Enhanced input X-ray">
+            <div class="viewer-overlay"><img alt="Explanation layer"></div>
+            <div class="compare-handle" aria-hidden="true"><span></span></div>
+            <input class="compare-range" type="range" min="0" max="100" value="100" aria-label="Reveal original image">
+            <button class="icon-btn viewer-expand" type="button" aria-label="View full screen">
+              <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+            </button>
+          </div>
+
+          <div class="viewer-foot">
+            <p class="layer-caption"></p>
+            <div class="heat-legend small" aria-hidden="true"><span>Low</span><i></i><span>High</span></div>
+          </div>
+        </div>
+
+        <div class="insight-col">
+          <section class="card glass path-card" data-spot>
+            <h3>How the decision was reached</h3>
+            <ol class="path">
+              <li class="path-node" data-node="1">
+                <span class="path-dot"></span>
+                <div>
+                  <p class="path-title">Screening</p>
+                  <p class="path-value stage1-value">—</p>
+                  <div class="meter"><span class="meter-fill"></span><span class="meter-cut"></span></div>
+                  <p class="path-hint stage1-hint"></p>
+                </div>
+              </li>
+              <li class="path-node" data-node="2">
+                <span class="path-dot"></span>
+                <div>
+                  <p class="path-title">Classification</p>
+                  <p class="path-value stage2-value">—</p>
+                  <p class="path-hint stage2-hint"></p>
+                </div>
+              </li>
+            </ol>
+          </section>
+
+          <section class="card glass" data-spot>
+            <h3>Likelihood by outcome</h3>
+            <ul class="bars"></ul>
+          </section>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<div class="lightbox-modal" id="lightbox-modal" hidden>
+  <button class="icon-btn modal-close" type="button" aria-label="Close">
+    <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+  </button>
+  <img alt="">
+</div>
+
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/analyze.js') }}"></script>{% endblock %}

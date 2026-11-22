@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}PulmoLens{% endblock %} | PulmoLens</title>
+<meta name="description" content="Explainable chest X-ray screening for Normal, Pneumonia, Tuberculosis and COVID-19.">
+<meta name="theme-color" content="#07111A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='m' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23F6F9FB'/%3E%3Cstop offset='.5' stop-color='%238E9BA7'/%3E%3Cstop offset='1' stop-color='%23E9EFF3'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M14.2 5.2C9.2 6.4 4 12.6 4 21.3c0 3 2.6 4.6 5.3 3.4l4.9-2.2V5.2z' fill='url(%23m)'/%3E%3Cpath d='M17.8 5.2c5 1.2 10.2 7.4 10.2 16.1 0 3-2.6 4.6-5.3 3.4l-4.9-2.2V5.2z' fill='url(%23m)'/%3E%3Ccircle cx='20.6' cy='16.6' r='5.4' fill='%2307111A' stroke='%236FD3E8' stroke-width='1.6'/%3E%3Ccircle cx='20.6' cy='16.6' r='1.9' fill='%236FD3E8'/%3E%3C/svg%3E">
+<link rel="preload" href="{{ url_for('static', filename='fonts/bricolage-grotesque-latin-wght-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+{% block head %}{% endblock %}
+</head>
+<body class="page-{{ page }}">
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="ambient" aria-hidden="true">
+  <span class="orb orb-1"></span>
+  <span class="orb orb-2"></span>
+  <span class="orb orb-3"></span>
+  <span class="orb orb-4"></span>
+  <span class="ambient-grid"></span>
+  <span class="ambient-grain"></span>
+</div>
+
+<header class="topbar">
+  <a class="brand" href="/" aria-label="PulmoLens home">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 32 32">
+        <defs>
+          <linearGradient id="brand-metal" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#F6F9FB"/>
+            <stop offset=".45" stop-color="#8E9BA7"/>
+            <stop offset=".7" stop-color="#E9EFF3"/>
+            <stop offset="1" stop-color="#A3B0BC"/>
+          </linearGradient>
+        </defs>
+        <path class="bm-lobe" d="M14.2 5.2C9.2 6.4 4 12.6 4 21.3c0 3 2.6 4.6 5.3 3.4l4.9-2.2V5.2z" fill="url(#brand-metal)"/>
+        <path class="bm-lobe" d="M17.8 5.2c5 1.2 10.2 7.4 10.2 16.1 0 3-2.6 4.6-5.3 3.4l-4.9-2.2V5.2z" fill="url(#brand-metal)"/>
+        <circle class="bm-lens" cx="20.6" cy="16.6" r="5.4" fill="#07111A" stroke="#6FD3E8" stroke-width="1.6"/>
+        <circle class="bm-dot" cx="20.6" cy="16.6" r="1.9"/>
+      </svg>
+    </span>
+    <span class="brand-word">PulmoLens</span>
+  </a>
+
+  <nav class="nav" aria-label="Main">
+    <span class="nav-pill" aria-hidden="true"></span>
+    {% for key, href, label in nav_items %}
+      <a href="{{ href }}" class="nav-link{% if page == key %} is-active{% endif %}"{% if page == key %} aria-current="page"{% endif %}>{{ label }}</a>
+    {% endfor %}
+  </nav>
+
+  <a class="btn btn-primary btn-sm topbar-cta" href="/analyze"><span>New scan</span></a>
+
+  <button class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+    <span></span><span></span>
+  </button>
+</header>
+
+<div class="mobile-nav" id="mobile-nav" hidden>
+  {% for key, href, label in nav_items %}
+    <a href="{{ href }}" class="{% if page == key %}is-active{% endif %}">{{ label }}</a>
+  {% endfor %}
+</div>
+
+<main id="main">
+{% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <strong>PulmoLens</strong>
+      <p>Explainable chest X-ray screening. A BMSCE final-year research project.</p>
+    </div>
+    <p class="footer-note">Research demonstration only. Not a medical device and not for clinical decisions.</p>
+  </div>
+</footer>
+
+<div class="toast-stack" aria-live="polite"></div>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

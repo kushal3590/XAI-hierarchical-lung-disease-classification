@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}History{% endblock %}
+{% block content %}
+
+<section class="page-head">
+  <div>
+    <h1 class="metal-text">Scan history</h1>
+    <p>Scans you've analyzed in this browser. They're stored locally and never sent anywhere.</p>
+  </div>
+  <button class="btn btn-ghost btn-sm" id="clear-history" type="button" hidden>
+    <svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
+    Clear history
+  </button>
+</section>
+
+<div class="history-tools" hidden>
+  <div class="chips" role="group" aria-label="Filter by outcome">
+    <button class="chip is-on" data-filter="all">All <span class="chip-count"></span></button>
+    <button class="chip" data-filter="Normal" style="--c: var(--normal)"><i></i>Normal <span class="chip-count"></span></button>
+    <button class="chip" data-filter="Pneumonia" style="--c: var(--pneumonia)"><i></i>Pneumonia <span class="chip-count"></span></button>
+    <button class="chip" data-filter="Tuberculosis" style="--c: var(--tb)"><i></i>Tuberculosis <span class="chip-count"></span></button>
+    <button class="chip" data-filter="COVID-19" style="--c: var(--covid)"><i></i>COVID-19 <span class="chip-count"></span></button>
+  </div>
+  <label class="search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>
+    <input type="search" id="history-search" placeholder="Search by file name" aria-label="Search by file name">
+  </label>
+</div>
+
+<div class="history-grid" id="history-grid"></div>
+
+<div class="history-empty glass" id="history-empty" hidden>
+  <div class="empty-orb"><svg viewBox="0 0 24 24"><path d="M12 8v4l2.5 2.5"/><circle cx="12" cy="12" r="8.5"/></svg></div>
+  <h2>No scans yet</h2>
+  <p>Analyze an X-ray and it will be saved here so you can reopen and compare results.</p>
+  <a class="btn btn-primary" href="/analyze"><span>Analyze an X-ray</span></a>
+</div>
+
+<p class="history-nomatch" id="history-nomatch" hidden>No scans match this filter.</p>
+
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/history.js') }}"></script>{% endblock %}

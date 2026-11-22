@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+{% block content %}
+
+<section class="about-hero">
+  <h1 class="metal-text">Built to make chest X-ray AI easier to question</h1>
+  <p>PulmoLens is the demonstration app for <em>An XAI-Driven Multiscale Framework for Hierarchical Lung Disease Classification</em>, a final-year project in the Department of Computer Science and Engineering at BMS College of Engineering.</p>
+</section>
+
+<section class="about-grid">
+  <div class="about-block glass" data-spot>
+    <h2>The idea</h2>
+    <p>Most chest X-ray classifiers give a label and stop there. This project pairs a two-stage classifier with several explanation methods, so anyone reviewing a result can see what it was based on and spot when the model has learned the wrong thing.</p>
+    <p>That focus shaped the model itself: the team used the explanations to find shortcut patterns, then retrained with those regions masked out.</p>
+  </div>
+
+  <div class="about-block glass" data-spot>
+    <h2>The team</h2>
+    <ul class="people">
+      <li><span class="avatar">KN</span><div><strong>Kushal Naidu N</strong><small>Project team</small></div></li>
+      <li><span class="avatar">MG</span><div><strong>Mahesha GS</strong><small>Project team</small></div></li>
+      <li><span class="avatar">NG</span><div><strong>Nagaraja G</strong><small>Project team</small></div></li>
+      <li class="is-guide"><span class="avatar">BK</span><div><strong>Dr. Bhavani K</strong><small>Project guide, Dept. of CSE</small></div></li>
+    </ul>
+  </div>
+</section>
+
+<section class="stack">
+  <h2 class="metal-text">Under the hood</h2>
+  <dl class="stack-list glass">
+    <div><dt>Model</dt><dd>Multi-scale EfficientNet-B0 with two prediction heads</dd></div>
+    <div><dt>Preprocessing</dt><dd>CLAHE contrast enhancement, 224 × 224 resize</dd></div>
+    <div><dt>Explanations</dt><dd>Grad-CAM, SHAP and LIME</dd></div>
+    <div><dt>Training data</dt><dd>Five public chest X-ray datasets</dd></div>
+    <div><dt>App</dt><dd>Flask and PyTorch, running locally</dd></div>
+  </dl>
+</section>
+
+<section class="cta-band glass" data-reveal data-spot>
+  <span class="cta-glow" aria-hidden="true"></span>
+  <h2 class="metal-text">Try it on an X-ray</h2>
+  <p>See the prediction, the decision path and the heatmaps for yourself.</p>
+  <a class="btn btn-primary" href="/analyze"><span>Analyze an X-ray</span></a>
+</section>
+
+{% endblock %}

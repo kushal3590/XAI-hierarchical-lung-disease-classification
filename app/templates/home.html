@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Explainable chest X-ray screening{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="hero-copy">
+    <h1 class="hero-title metal-text" data-split>See what the model sees.</h1>
+    <p class="hero-lede">
+      Upload a chest X-ray. PulmoLens screens it for pneumonia, tuberculosis and COVID-19,
+      then shows you the regions of the lungs that shaped its answer.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="/analyze"><span>Analyze an X-ray</span></a>
+      <a class="btn btn-ghost" href="/history"><span>View past scans</span></a>
+    </div>
+  </div>
+
+  <div class="hero-stage">
+    <div class="halo" aria-hidden="true">
+      <span class="halo-ring r1"></span>
+      <span class="halo-ring r2"></span>
+      <span class="halo-ring r3"></span>
+      <span class="halo-glow"></span>
+    </div>
+    {% with lid = "hero" %}{% include "_lungs.html" %}{% endwith %}
+    <span class="float-chip c1" style="--c: var(--normal)"><i></i>Normal</span>
+    <span class="float-chip c2" style="--c: var(--pneumonia)"><i></i>Pneumonia</span>
+    <span class="float-chip c3" style="--c: var(--tb)"><i></i>Tuberculosis</span>
+    <span class="float-chip c4" style="--c: var(--covid)"><i></i>COVID-19</span>
+  </div>
+</section>
+
+<section class="section pipeline" data-reveal>
+  <div class="section-head">
+    <h2 class="metal-text">From upload to explanation</h2>
+    <p>Every X-ray goes through the same four steps, and each one is visible in your results.</p>
+  </div>
+  <div class="steps-panel glass" data-spot>
+  <ol class="steps">
+    <li class="step">
+      <span class="step-num">1</span>
+      <h3>Enhance</h3>
+      <p>Contrast is equalised and the image resized, so faint shadows stand out.</p>
+    </li>
+    <li class="step">
+      <span class="step-num">2</span>
+      <h3>Screen</h3>
+      <p>The first stage decides whether the lungs look normal or abnormal.</p>
+    </li>
+    <li class="step">
+      <span class="step-num">3</span>
+      <h3>Classify</h3>
+      <p>Abnormal scans go on to separate pneumonia, tuberculosis and COVID-19.</p>
+    </li>
+    <li class="step">
+      <span class="step-num">4</span>
+      <h3>Explain</h3>
+      <p>Heatmaps show where each stage looked when it made its call.</p>
+    </li>
+  </ol>
+  </div>
+</section>
+
+<section class="section conditions" data-reveal>
+  <div class="section-head">
+    <h2 class="metal-text">What it looks for</h2>
+    <p>Four possible outcomes, each with its own typical pattern on a radiograph.</p>
+  </div>
+  <ul class="condition-list">
+    <li class="condition" style="--c: var(--normal)">
+      <span class="condition-dot"></span>
+      <h3>Normal</h3>
+      <p>Clear, dark lung fields with sharp heart and diaphragm borders.</p>
+    </li>
+    <li class="condition" style="--c: var(--pneumonia)">
+      <span class="condition-dot"></span>
+      <h3>Pneumonia</h3>
+      <p>Patchy or lobar white areas where air spaces fill with fluid.</p>
+    </li>
+    <li class="condition" style="--c: var(--tb)">
+      <span class="condition-dot"></span>
+      <h3>Tuberculosis</h3>
+      <p>Often upper-zone infiltrates, nodules or cavities.</p>
+    </li>
+    <li class="condition" style="--c: var(--covid)">
+      <span class="condition-dot"></span>
+      <h3>COVID-19</h3>
+      <p>Frequently hazy, ground-glass shadows on both sides, toward the edges.</p>
+    </li>
+  </ul>
+</section>
+
+<section class="section lenses" data-reveal>
+  <div class="lens-copy">
+    <h2 class="metal-text">An answer you can check</h2>
+    <p>
+      A label on its own is hard to trust. Every result shows how the decision was made
+      and which parts of the image pushed the model toward it, so you can judge whether it
+      was looking at the lungs.
+    </p>
+  </div>
+  <div class="lens-cards">
+    <div class="lens glass" data-spot>
+      <span class="lens-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg></span>
+      <div><h3>Grad-CAM heatmaps</h3><p>Fast. Highlights the regions each stage relied on, for every scan.</p></div>
+    </div>
+    <div class="lens glass" data-spot>
+      <span class="lens-icon"><svg viewBox="0 0 24 24"><path d="M4 18h16M7 15V9m5 6V5m5 10v-4"/></svg></span>
+      <div><h3>SHAP attribution</h3><p>Slower and more detailed. Shows which areas raised or lowered the score.</p></div>
+    </div>
+    <div class="lens glass" data-spot>
+      <span class="lens-icon"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="12" r="2"/><path d="M6 8v8M8 6.8l8 4.4"/></svg></span>
+      <div><h3>Decision path</h3><p>Shows the screening score against its cutoff, then the classification step.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band glass" data-reveal data-spot>
+  <span class="cta-glow" aria-hidden="true"></span>
+  <h2 class="metal-text">Have an X-ray ready?</h2>
+  <p>Results take a few seconds. Nothing leaves your computer.</p>
+  <a class="btn btn-primary" href="/analyze"><span>Analyze an X-ray</span></a>
+</section>
+
+{% endblock %}
